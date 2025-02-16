@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import axios from 'axios';
+import { baseUrl } from '../api/api';
 
 export interface TaxiData {
   vendor_id: string;
@@ -13,6 +13,9 @@ export interface TaxiData {
   payment_type: string;
   pickup_datetime: string;
   dropoff_datetime: string;
+  totalTrips: number;
+  totalDistance: number;
+  averageDistance: number;
 }
 
 interface Filters {
@@ -66,6 +69,9 @@ interface TaxiStore {
 
   // Optional: data summary (totalItems, dll)
   totalItems: number;
+  averageDistance: number;
+  totalDistance: number;
+  totalTrips: number;
 }
 
 
@@ -118,7 +124,8 @@ export const useTaxiStore = create<TaxiStore>((set, get) => ({
         )
       ).toString();
 
-      const response = await axios.get(`http://localhost:3000/taxi?${params}`);
+      // const response = await axios.get(`http://localhost:3000/taxi?${params}`);
+      const response = await baseUrl.get(`/taxi?${params}`);
       const newData: TaxiData[] = response.data.data;
 
       const updatedData = reset ? newData : [...get().scatterData, ...newData];
@@ -164,7 +171,8 @@ export const useTaxiStore = create<TaxiStore>((set, get) => ({
         )
       ).toString();
 
-      const response = await axios.get(`http://localhost:3000/taxi?${params}`);
+      // const response = await axios.get(`http://localhost:3000/taxi?${params}`);
+      const response = await baseUrl.get(`/taxi?${params}`);
       const newData: TaxiData[] = response.data.data;
 
       const updatedData = reset ? newData : [...get().scatterData, ...newData];
@@ -212,7 +220,8 @@ export const useTaxiStore = create<TaxiStore>((set, get) => ({
         )
       ).toString();
 
-      const response = await axios.get(`http://localhost:3000/taxi?${params}`);
+      // const response = await axios.get(`http://localhost:3000/taxi?${params}`);
+      const response = await baseUrl.get(`/taxi?${params}`);
       const newData: TaxiData[] = response.data.data;
 
       const updatedData = reset ? newData : [...get().mapData, ...newData];
