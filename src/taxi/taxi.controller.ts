@@ -1,5 +1,6 @@
 import { Controller, Get, Query } from "@nestjs/common";
 import { TaxiService } from "./taxi.service";
+import { MonthlyTrip } from "./taxi.service"
 
 @Controller('taxi')
 export class TaxiController {
@@ -38,4 +39,10 @@ export class TaxiController {
       min_distance, max_distance
     }, Number(page), Number(limit));
   }
+
+  @Get("monthly-trip-count")
+  async getMonthlyTripCount(@Query() filters: any): Promise<MonthlyTrip[]> {
+    return this.taxiService.getMonthlyTripCount(filters);
+  }
+
 }

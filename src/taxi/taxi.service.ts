@@ -1,9 +1,16 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import axios from 'axios';
 
+export interface MonthlyTrip {
+  month: string;
+  totalTrips: number;
+}
+
+
 @Injectable()
 export class TaxiService {
   private readonly apiUrl = 'https://data.cityofnewyork.us/resource/gkne-dk5s.json';
+  private cachedData: any[] = []
 
   async getData(filters: any, page: number = 1, limit: number = 10) {
     try {
@@ -31,17 +38,21 @@ export class TaxiService {
         });
       }
 
-      // Filter berdasarkan waktu pickup/dropoff
       if (filters.start_time && filters.end_time) {
         const startTime = new Date(filters.start_time).getTime();
         const endTime = new Date(filters.end_time).getTime();
         data = data.filter(item => {
           const pickupTime = new Date(item.pickup_datetime).getTime();
-          return pickupTime >= startTime && pickupTime <= endTime;
+          const dropoffTime = item.dropoff_datetime ? new Date(item.dropoff_datetime).getTime() : null;
+          return (pickupTime >= startTime && pickupTime <= endTime) || (dropoffTime && dropoffTime >= startTime && dropoffTime <= endTime);
         });
       }
 
-      // Filter berdasarkan jumlah penumpang
+      data = data.map(item => ({
+        ...item,
+        dropoff_datetime: item.dropoff_datetime || null,
+      }));
+
       if (filters.min_passengers) {
         data = data.filter(item => Number(item.passenger_count) >= filters.min_passengers);
       }
@@ -49,7 +60,6 @@ export class TaxiService {
         data = data.filter(item => Number(item.passenger_count) <= filters.max_passengers);
       }
 
-      // Filter berdasarkan tarif dan jarak
       if (filters.min_fare) {
         data = data.filter(item => Number(item.fare_amount) >= filters.min_fare);
       }
@@ -63,24 +73,101 @@ export class TaxiService {
         data = data.filter(item => Number(item.trip_distance) <= filters.max_distance);
       }
 
-      // Pagination
+      // Pagination with limit 10, 100, 500, or 1000
       const totalItems = data.length;
       const startIndex = (page - 1) * limit;
       const paginatedData = data.slice(startIndex, startIndex + limit);
 
+      const totalDistance = data.reduce((acc, item) => acc + Number(item.trip_distance), 0);
+      const totalFare = data.reduce((acc, item) => acc + Number(item.fare_amount), 0);
+      const totalTrips = data.length;
+      const averageFare = totalTrips > 0 ? totalFare / totalTrips : 0;
+      const averageDistance = totalTrips > 0 ? totalDistance / totalTrips : 0;
+
       return {
+        totalDistance,
+        totalFare,
+        totalTrips,
+        averageDistance,
         totalItems,
         page,
         limit,
         totalPages: Math.ceil(totalItems / limit),
-        data: paginatedData,
+        data: paginatedData.map(item => ({
+          ...item,
+          passenger_count: Number(item.passenger_count),
+        }))
       };
     } catch (error) {
       throw new HttpException('Error fetching data', HttpStatus.BAD_GATEWAY);
     }
   }
 
-  // Haversine Formula untuk menghitung jarak antar koordinat
+  // Definisi tipe data hasil akhir
+
+
+  async getMonthlyTripCount(filters: any) {
+    try {
+      if (this.cachedData.length === 0) {
+        const response = await axios.get(this.apiUrl);
+        this.cachedData = response.data || []; 
+      }
+
+      let data = [...this.cachedData]; 
+      console.log("Jumlah total data dari API:", data.length);
+
+      if (filters.start_time && filters.end_time) {
+        const startTime = new Date(filters.start_time).getTime();
+        const endTime = new Date(filters.end_time).getTime();
+
+        data = data.filter(item => {
+          const pickupTime = new Date(item.pickup_datetime).getTime();
+          return pickupTime >= startTime && pickupTime <= endTime;
+        });
+      }
+
+      const monthNames = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+      ];
+
+      const monthlyCounts: Record<string, MonthlyTrip> = {};
+
+  
+
+      data.forEach(item => {
+        const date = new Date(item.pickup_datetime);
+        const year = date.getUTCFullYear(); 
+        const monthIndex = date.getUTCMonth(); 
+        const monthKey = `${year}-${monthIndex}`; 
+      
+        if (!monthlyCounts[monthKey]) {
+          monthlyCounts[monthKey] = { month: monthNames[monthIndex], totalTrips: 0 };
+        }
+        monthlyCounts[monthKey].totalTrips++;
+      });
+
+      const result: MonthlyTrip[] = Object.keys(monthlyCounts)
+        .sort((a, b) => {
+          const [yearA, monthA] = a.split("-").map(Number);
+          const [yearB, monthB] = b.split("-").map(Number);
+          return yearA !== yearB ? yearA - yearB : monthA - monthB;
+        })
+        .map(key => monthlyCounts[key]);
+
+      console.log("Hasil akhir trip per bulan:", result);
+
+      return result;
+    } catch (error) {
+      throw new HttpException("Error fetching data", HttpStatus.BAD_GATEWAY);
+    }
+  }
+  
+  
+
+  
+  
+
   private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
     const R = 6371; // Radius Bumi dalam km
     const dLat = this.deg2rad(lat2 - lat1);
@@ -99,3 +186,4 @@ export class TaxiService {
     return deg * (Math.PI / 180);
   }
 }
+
