@@ -2,6 +2,16 @@ import 'leaflet/dist/leaflet.css';
 import React, { useEffect } from 'react';
 import { MapContainer, Marker, Popup, TileLayer, Tooltip } from 'react-leaflet';
 import { useTaxiStore } from '../store/useTaxiStore';
+import L from 'leaflet';
+
+const customIcon = new L.Icon({
+  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
 
 export const Map: React.FC = () => {
   const {
@@ -39,7 +49,7 @@ export const Map: React.FC = () => {
           {mapLoading && <p>Loading...</p>}
           {error && <p>{error}</p>}
           {mapData.map((taxi, index) => (
-            <Marker key={index} position={[taxi.pickup_latitude, taxi.pickup_longitude]}>
+            <Marker key={index} position={[taxi.pickup_latitude, taxi.pickup_longitude]} icon={customIcon}>
               <Tooltip direction="top" offset={[0, -10]} opacity={1}>
                 <strong>Vendor:</strong> {taxi.vendor_id} <br />
                 <strong>Fare:</strong> ${taxi.fare_amount} <br />
