@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { About } from './pages/About';
 import { Dashboard } from './pages/Dashboard';
@@ -10,20 +10,12 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path='/' element={<MainLayout />}>
-
-          <Route path="/map" element={<Map />} />
-          <Route path="/home" element={<Dashboard />} />
-          <Route path="/linnegraph" element={<About />} />
+          <Route path="/" element={<MainLayout />}>
+            <Route index element={<Navigate to="/home" replace />} />
+            <Route path="/map" element={<Map />} />
+            <Route path="/home" element={<Dashboard />} />
+            <Route path="/linnegraph" element={<About />} />
           </Route>
-          {/* <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          /> */}
         </Routes>
       </BrowserRouter>
     </AuthProvider>
