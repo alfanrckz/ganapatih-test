@@ -1,27 +1,50 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Scatter } from "react-chartjs-2";
 import { Chart, ChartOptions, registerables } from "chart.js";
+import { useTaxiStore } from "../../store/useTaxiStore";
 
 Chart.register(...registerables);
 
 export const ScatterChart = () => {
-  const [selectedOption, setSelectedOption] = useState("passenger_count");
+  const {
+    scatterData,
+    scatterLoading,
+    fetchScatterData,
+    loadMoreScatter,
+    scatterHasMore,
+    scatterLimit,
+  } = useTaxiStore();
 
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedOption(event.target.value);
+  const [selectedOption, setSelectedOption] = useState("passenger_count");
+  const [selectedLimit, setSelectedLimit] = useState(scatterLimit);
+
+  useEffect(() => {
+    fetchScatterData(true, 1, selectedLimit);
+  }, [selectedLimit, fetchScatterData]);
+
+  const handleOptionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedOption(e.target.value);
   };
 
-  const data = {
+  const handleLimitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newLimit = Number(e.target.value);
+    setSelectedLimit(newLimit);
+  };
+
+  const chartData = {
     datasets: [
       {
-        label: "Passengers vs Trip Distance",
-        data: [
-          { x: 1, y: 2.5 },
-          { x: 2, y: 3.2 },
-          { x: 3, y: 4.8 },
-          { x: 4, y: 5.1 },
-          { x: 5, y: 7.4 },
-        ],
+        label:
+          selectedOption === "passenger_count"
+            ? "Passenger Count vs Trip Distance"
+            : "Fare vs Trip Distance",
+        data: scatterData.map((item) => ({
+          x: item.trip_distance,
+          y:
+            selectedOption === "passenger_count"
+              ? Number(item.passenger_count)
+              : Number(item.fare_amount),
+        })),
         backgroundColor: "rgba(75, 192, 192, 0.6)",
       },
     ],
@@ -30,53 +53,91 @@ export const ScatterChart = () => {
   const options: ChartOptions<"scatter"> = {
     responsive: true,
     plugins: {
-      legend: {
-        position: "top" as const,
-      },
+      legend: { labels: { color: "white" }, position: "top" },
       title: {
         display: true,
-        text: "Passenger Count vs Trip Distance",
+        text:
+          selectedOption === "passenger_count"
+            ? "Passenger Count vs Trip Distance"
+            : "Fare vs Trip Distance",
+        color: "white",
       },
     },
     scales: {
       x: {
-        title: {
-          display: true,
-          text: "Passenger Count",
-        },
+        title: { display: true, text: "Trip Distance", color: "white" },
+        ticks: { color: "white" },
+        grid: { color: "rgba(255, 255, 255, 0.3)" },
       },
       y: {
         title: {
           display: true,
-          text: "Trip Distance (miles)",
+          text:
+            selectedOption === "passenger_count"
+              ? "Passenger Count"
+              : "Fare Amount",
+          color: "white",
         },
+        ticks: { color: "white" },
+        grid: { color: "rgba(255, 255, 255, 0.3)" },
       },
     },
   };
 
   return (
-    <div className="bg-[#0B192C] shadow-lg border border-e-slate-100 rounded-lg p-6">
-      <h2 className="text-xl font-bold mb-4 text-white">Scatter Chart</h2>
+    <div className="bg-[#0B192C] shadow-lg border-8 border-gray-400 rounded-lg p-6">
+      <div className="mb-4 flex flex-col sm:flex-row gap-4">
+        <div>
+          <label htmlFor="data-select" className="block text-white font-medium mb-2">
+            Select Data
+          </label>
+          <select
+            id="data-select"
+            value={selectedOption}
+            onChange={handleOptionChange}
+            className="px-4 py-2 border border-white rounded-md text-white"
+            style={{ backgroundColor: "transparent" }}
+          >
+            <option value="passenger_count" className="bg-[#0B192C]">Passenger Count</option>
+            <option value="fare" className="bg-[#0B192C]">Fare</option>
+          </select>
+        </div>
 
-      <div className="mb-4">
-        <label htmlFor="data-select" className="block text-white font-medium mb-2">
-          Pilih Data:
-        </label>
-        <select
-          id="data-select"
-          value={selectedOption}
-          onChange={handleChange}
-          className="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="passenger_count">Passenger Count</option>
-          <option value="pickup_datetime">Pickup Date Time</option>
-          <option value="dropoff_datetime">Dropoff Date Time</option>
-        </select>
+        <div>
+          <label htmlFor="limit-select" className="block text-white font-medium mb-2">
+            Select Data Limit
+          </label>
+          <select
+            id="limit-select"
+            value={selectedLimit}
+            onChange={handleLimitChange}
+            className="px-4 py-2 border border-white rounded-md text-white"
+            style={{ backgroundColor: "transparent" }}
+          >
+            <option value={10} className="bg-[#0B192C]">10</option>
+            <option value={50} className="bg-[#0B192C]">50</option>
+            <option value={100} className="bg-[#0B192C]">100</option>
+            <option value={500} className="bg-[#0B192C]">500</option>
+            <option value={1000} className="bg-[#0B192C]">1000</option>
+          </select>
+        </div>
       </div>
 
-    <div className="h-[50vh] overflow-y-auto">
-      <Scatter data={data} options={options} />
-    </div>
+      <div className="h-[50vh] overflow-y-auto">
+        <Scatter data={chartData} options={options} />
+        {scatterLoading && <p className="text-white mt-4">Loading...</p>}
+        {scatterHasMore && (
+          <div className="text-center mt-4">
+            <button
+              onClick={loadMoreScatter}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              Load More
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
+

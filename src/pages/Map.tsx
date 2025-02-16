@@ -1,64 +1,293 @@
-import 'leaflet/dist/leaflet.css'; // 
-import React from 'react';
-import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+// import 'leaflet/dist/leaflet.css';
+// import React, { useEffect } from 'react';
+// import { MapContainer, Marker, Popup, TileLayer, Tooltip } from 'react-leaflet';
+// import { useTaxiStore } from '../store/useTaxiStore';
+
+// export const Map: React.FC = () => {
+//   const {
+//     data,
+//     loading,
+//     error,
+//     fetchData,
+//     loadMoreMap,
+//     hasMore,
+//     mapType,
+//     setMapType,
+//     filters,
+//     setFilters,
+//     totalItems
+//   } = useTaxiStore();
+  
+//   useEffect(() => {
+//     fetchData(true); // Ambil data saat komponen pertama kali dimuat
+//   }, [fetchData]);
+
+//   const tileLayerURLs: Record<string, string> = {
+//     Street: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+//     Satellite: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+//     Terrain: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+//   };
+
+//   return (
+//     <div className="flex gap-5 flex-col md:flex-row">
+//       <div className='w-full md:w-[80%] h-[80vh] border-8 border-white rounded-lg'>
+//         <MapContainer center={[40.7228, -73.9888]} zoom={12} style={{ height: '100%', width: '100%' }}>
+//           <TileLayer
+//             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+//             url={tileLayerURLs[mapType]}
+//           />
+//           {loading && <p>Loading...</p>}
+//           {error && <p>{error}</p>}
+//           {data.map((taxi, index) => (
+//             <Marker key={index} position={[taxi.pickup_latitude, taxi.pickup_longitude]}>
+//               <Tooltip direction="top" offset={[0, -10]} opacity={1}>
+//                 <strong>Vendor:</strong> {taxi.vendor_id} <br />
+//                 <strong>Fare:</strong> ${taxi.fare_amount} <br />
+//                 <strong>Distance:</strong> {taxi.trip_distance} km <br />
+//                 <strong>Payment:</strong> {taxi.payment_type}
+//                 <Popup autoClose={false} closeOnClick={false} closeButton={false}>
+//                   <strong>Vendor:</strong> {taxi.vendor_id} <br />
+//                   <strong>Fare:</strong> ${taxi.fare_amount} <br />
+//                   <strong>Distance:</strong> {taxi.trip_distance} km <br />
+//                   <strong>Payment:</strong> {taxi.payment_type}
+//                 </Popup>
+//               </Tooltip>
+//             </Marker>
+//           ))}
+//         </MapContainer>        
+//       </div>
+
+//       {/* Sidebar */}
+//       <div className="max-w-sm rounded overflow-hidden shadow-lg bg-[#1E3E62] p-6 h-auto">
+//         <div className="py-4">
+//           <h2 className="text-xl font-bold text-white">Filters</h2>
+//         </div>
+
+//         <label className="block text-white">Fare Range</label>
+//         <div className="flex gap-2">
+//           <input
+//             type="number"
+//             placeholder="Min"
+//             value={filters.min_fare || ''}
+//             onChange={(e) => setFilters({ ...filters, min_fare: Number(e.target.value) })}
+//             className="border rounded p-2 w-1/2"
+//           />
+//           <input
+//             type="number"
+//             placeholder="Max"
+//             value={filters.max_fare || ''}
+//             onChange={(e) => setFilters({ ...filters, max_fare: Number(e.target.value) })}
+//             className="border rounded p-2 w-1/2"
+//           />
+//         </div>
+        
+//         <label className="block text-white mt-4">Trip Distance</label>
+//         <div className="flex gap-2">
+//           <input
+//             type="number"
+//             placeholder="Min"
+//             value={filters.min_distance || ''}
+//             onChange={(e) => setFilters({ ...filters, min_distance: Number(e.target.value) })}
+//             className="border rounded p-2 w-1/2"
+//           />
+//           <input
+//             type="number"
+//             placeholder="Max"
+//             value={filters.max_distance || ''}
+//             onChange={(e) => setFilters({ ...filters, max_distance: Number(e.target.value) })}
+//             className="border rounded p-2 w-1/2"
+//           />
+//         </div>
+
+//         <label className="block text-white mt-4">Payment Type</label>
+//         <select
+//           className="border rounded p-2 w-full"
+//           value={filters.payment_type || ''}
+//           onChange={(e) => setFilters({ payment_type: e.target.value })}
+//         >
+//           <option value="">All</option>
+//           <option value="Cash">Cash</option>
+//           <option value="Card">Card</option>
+//         </select>
+        
+//         <div className="py-4">
+//           <h2 className="text-xl font-bold text-white">Map Type</h2>
+//         </div>
+//         <div className="mt-4">
+//           {["Satellite", "Terrain", "Street"].map((type) => (
+//             <label key={type} className="flex items-center">
+//               <input
+//                 type="radio"
+//                 name="mapType"
+//                 value={type}
+//                 checked={mapType === type}
+//                 onChange={() => setMapType(type)}
+//                 className="form-radio text-blue-500"
+//               />
+//               <span className="ml-2 text-white">{type}</span>
+//             </label>
+//           ))}
+//         </div>
+//         {hasMore && (
+//           <div className="flex-col justify-center mt-4 text-center">
+//             <p className="text-white mb-2">Showing {data.length} of {totalItems} trips</p>
+//             <button
+//               onClick={loadMoreMap}
+//               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+//             >
+//               Load More
+//             </button>
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+import 'leaflet/dist/leaflet.css';
+import React, { useEffect } from 'react';
+import { MapContainer, Marker, Popup, TileLayer, Tooltip } from 'react-leaflet';
+import { useTaxiStore } from '../store/useTaxiStore';
 
 export const Map: React.FC = () => {
+  const {
+    mapData,
+    mapLoading,
+    error,
+    fetchMapData,
+    loadMoreMap,
+    mapHasMore,
+    mapType,
+    setMapType,
+    filters,
+    setFilters,
+    totalItems,
+  } = useTaxiStore();
+  
+  useEffect(() => {
+    fetchMapData(true, 1); // Ambil data saat komponen pertama kali dimuat untuk Map
+  }, [fetchMapData]);
+
+  const tileLayerURLs: Record<string, string> = {
+    Street: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    Satellite: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+    Terrain: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+  };
+
   return (
-    <>
-      <div className="">
-        <div className='flex gap-5'>
-
-        <div className='w-[80%] h-[80vh]'>
-
-        <MapContainer center={[51.505, -0.09]} zoom={13} style={{ height: '100%', width: '100%' }}>
-     
+    <div className="flex gap-5 flex-col md:flex-row">
+      <div className='w-full md:w-[80%] h-[80vh] border-8 border-white rounded-lg'>
+        <MapContainer center={[40.7228, -73.9888]} zoom={12} style={{ height: '100%', width: '100%' }}>
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-
-          <Marker position={[51.505, -0.09]}>
-            <Popup>
-              A pretty CSS3 popup. <br /> Easily customizable.
-            </Popup>
-          </Marker>
-        </MapContainer>
-        </div>
-
-        <div className="max-w-sm rounded overflow-hidden shadow-lg bg-white p-6 h-96">
-          <div className="py-4">
-            <h2 className="text-xl font-bold text-gray-900">Map type</h2>
-            <p className="text-gray-600 mt-2">
-              This is a simple card created with Tailwind CSS. You can add any content you like.
-            </p>
-          </div>
-
-          <div className="mt-4">
-            <label className="block text-gray-700 mb-2">Select Map View</label>
-            <div className="flex flex-col space-y-2">
-              <label className="flex items-center">
-                <input type="radio" name="mapType" className="form-radio text-blue-500" />
-                <span className="ml-2 text-gray-700">Satellite</span>
-              </label>
-              <label className="flex items-center">
-                <input type="radio" name="mapType" className="form-radio text-blue-500" />
-                <span className="ml-2 text-gray-700">Terrain</span>
-              </label>
-              <label className="flex items-center">
-                <input type="radio" name="mapType" className="form-radio text-blue-500" />
-                <span className="ml-2 text-gray-700">Street</span>
-              </label>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between mt-4">
-            <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Zoom map</button>
-          </div>
-        </div>
-
-
-        </div>
+            url={tileLayerURLs[mapType]}
+          />
+          {mapLoading && <p>Loading...</p>}
+          {error && <p>{error}</p>}
+          {mapData.map((taxi, index) => (
+            <Marker key={index} position={[taxi.pickup_latitude, taxi.pickup_longitude]}>
+              <Tooltip direction="top" offset={[0, -10]} opacity={1}>
+                <strong>Vendor:</strong> {taxi.vendor_id} <br />
+                <strong>Fare:</strong> ${taxi.fare_amount} <br />
+                <strong>Distance:</strong> {taxi.trip_distance} km <br />
+                <strong>Payment:</strong> {taxi.payment_type}
+                <Popup autoClose={false} closeOnClick={false} closeButton={false}>
+                  <strong>Vendor:</strong> {taxi.vendor_id} <br />
+                  <strong>Fare:</strong> ${taxi.fare_amount} <br />
+                  <strong>Distance:</strong> {taxi.trip_distance} km <br />
+                  <strong>Payment:</strong> {taxi.payment_type}
+                </Popup>
+              </Tooltip>
+            </Marker>
+          ))}
+        </MapContainer>        
       </div>
-    </>
+
+      {/* Sidebar */}
+      <div className="max-w-sm rounded overflow-hidden shadow-lg bg-[#1E3E62] p-6 h-auto">
+        <div className="py-4">
+          <h2 className="text-xl font-bold text-white">Filters</h2>
+        </div>
+        {/* Filter inputs (sama seperti sebelumnya) */}
+        <label className="block text-white">Fare Range</label>
+        <div className="flex gap-2">
+          <input
+            type="number"
+            placeholder="Min"
+            value={filters.min_fare || ''}
+            onChange={(e) => setFilters({ ...filters, min_fare: Number(e.target.value) })}
+            className="border rounded p-2 w-1/2"
+          />
+          <input
+            type="number"
+            placeholder="Max"
+            value={filters.max_fare || ''}
+            onChange={(e) => setFilters({ ...filters, max_fare: Number(e.target.value) })}
+            className="border rounded p-2 w-1/2"
+          />
+        </div>
+        
+        <label className="block text-white mt-4">Trip Distance</label>
+        <div className="flex gap-2">
+          <input
+            type="number"
+            placeholder="Min"
+            value={filters.min_distance || ''}
+            onChange={(e) => setFilters({ ...filters, min_distance: Number(e.target.value) })}
+            className="border rounded p-2 w-1/2"
+          />
+          <input
+            type="number"
+            placeholder="Max"
+            value={filters.max_distance || ''}
+            onChange={(e) => setFilters({ ...filters, max_distance: Number(e.target.value) })}
+            className="border rounded p-2 w-1/2"
+          />
+        </div>
+
+        <label className="block text-white mt-4">Payment Type</label>
+        <select
+          className="border rounded p-2 w-full"
+          value={filters.payment_type || ''}
+          onChange={(e) => setFilters({ payment_type: e.target.value })}
+        >
+          <option value="">All</option>
+          <option value="Cash">Cash</option>
+          <option value="Card">Card</option>
+        </select>
+        
+        <div className="py-4">
+          <h2 className="text-xl font-bold text-white">Map Type</h2>
+        </div>
+        <div className="mt-4">
+        {["Satellite", "Terrain", "Street"].map((type) => (
+  <label key={type} className="flex items-center">
+    <input
+      type="radio"
+      name="mapType"
+      value={type}
+      checked={mapType === type}
+      onChange={() => setMapType(type as "Street" | "Satellite" | "Terrain")}
+      className="form-radio text-blue-500"
+    />
+    <span className="ml-2 text-white">{type}</span>
+  </label>
+))}
+
+        </div>
+        {mapHasMore && (
+          <div className="flex-col justify-center mt-4 text-center">
+            <p className="text-white mb-2">Showing {mapData.length} of {totalItems} trips</p>
+            <button
+              onClick={loadMoreMap}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              Load More
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
+

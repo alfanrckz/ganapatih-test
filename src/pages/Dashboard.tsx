@@ -1,9 +1,8 @@
+import { CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import React from 'react';
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
-import { ScatterChart } from '../components/chart/scatterChart';
-import { BarChart } from '../components/chart/barChart';
+import { BarChart } from '../components/chart/BarChart';
 import { LineChart } from '../components/chart/LineChart';
+import { ScatterChart } from '../components/chart/ScatterChart';
 
 // Register the necessary Chart.js components
 ChartJS.register(
@@ -20,16 +19,16 @@ export const Dashboard: React.FC = () => {
   return (
     <div className='flex flex-col gap-5 pr-5'>
       <div className="bg-[#1E3E62] shadow rounded-lg p-6">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-4">Histogram</h1>
+        <h1 className="text-2xl font-semibold text-white mb-4">Scatter Chart</h1>
         <ScatterChart />
       </div>
 
-      <div className="bg-white shadow rounded-lg p-6">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-4">Histogram</h1>
+      <div className="bg-[#1E3E62] shadow rounded-lg p-6">
+        <h1 className="text-2xl font-semibold text-white mb-4">Bar Chart</h1>
         <BarChart />
       </div>
-      <div className="bg-white shadow rounded-lg p-6">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-4">Histogram</h1>
+      <div className="bg-[#1E3E62] shadow rounded-lg p-6">
+        <h1 className="text-2xl font-semibold text-white mb-4">Line Graph</h1>
         <LineChart />
       </div>
     </div>
