@@ -108,7 +108,7 @@ export const LineChart = () => {
             value={selectedLimit}
             onChange={handleLimitChange}
             className="px-4 py-2 border border-white rounded-md text-white"
-            style={{ backgroundColor: "bg-[#0B192C]" }}
+            style={{ backgroundColor: "transparent" }}
           >
             <option value={10} className="bg-[#0B192C]">10</option>
             <option value={50} className="bg-[#0B192C]">50</option>

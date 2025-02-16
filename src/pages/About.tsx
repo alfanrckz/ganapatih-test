@@ -1,16 +1,16 @@
 import React from 'react';
-import { MainLayout } from '../templates/layouts/MainLayout';
 
 export const About: React.FC = () => {
   return (
-    <MainLayout>
+    <div>
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">About Us</h1>
+        <h1 className="text-gray-400 mb-4">
+        2014 Yellow Taxi Trip Data
+        </h1>
         <p className="text-gray-600 mb-4">
-          We are a modern web application built with the latest technologies and best practices.
-          Our stack includes React, TypeScript, and follows the Atomic Design pattern.
+        These records are generated from the trip record submissions made by yellow taxi Technology Service Providers (TSPs). Each row represents a single trip in a yellow taxi. The trip records include fields capturing pick-up and drop-off dates/times, pick-up and drop-off taxi zone locations, trip distances, itemized fares, rate types, payment types, and driver-reported passenger counts.
         </p>
       </div>
-    </MainLayout>
+    </div>
   );
 };

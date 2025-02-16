@@ -1,6 +1,7 @@
 import { Chart, ChartOptions, registerables } from "chart.js";
 import { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
+import { baseUrl } from "../../api/api";
 
 Chart.register(...registerables);
 
@@ -24,14 +25,14 @@ export const BarChart = () => {
   const [chartData, setChartData] = useState<ChartData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:3000/taxi/monthly-trip-count");
-        if (!response.ok) throw new Error("Failed to fetch data");
-
-        const data: MonthlyData[] = await response.json();
-
+        const response = await baseUrl.get("/taxi/monthly-trip-count");
+  
+        const data: MonthlyData[] = response.data;
+  
         setChartData({
           labels: data.map((item: MonthlyData) => item.month),
           datasets: [
@@ -45,13 +46,16 @@ export const BarChart = () => {
           ],
         });
       } catch (error) {
+        console.error("Fetch error:", error);
         setError("Failed to fetch data");
         setChartData(null);
       }
     };
-
+  
     fetchData();
   }, []);
+  
+
 
   const options: ChartOptions<"bar"> = {
     responsive: true,
