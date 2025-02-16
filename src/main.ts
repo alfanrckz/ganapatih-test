@@ -4,13 +4,13 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  //CORS
   app.enableCors({
-    origin: 'http://localhost:5173',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: 'Content-Type,Authorization',
-  });
+    origin: "*", // Atau ['http://localhost:5173']
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    allowedHeaders: "Content-Type,Authorization,ngrok-skip-browser-warning",
+    optionsSuccessStatus: 200,
+  });  
 
-  await app.listen(3000);
+  await app.listen(3001);
 }
 bootstrap();

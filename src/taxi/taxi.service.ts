@@ -103,9 +103,6 @@ export class TaxiService {
     }
   }
 
-  // Definisi tipe data hasil akhir
-
-
   async getMonthlyTripCount(filters: any) {
     try {
       if (this.cachedData.length === 0) {
@@ -114,7 +111,6 @@ export class TaxiService {
       }
 
       let data = [...this.cachedData]; 
-      console.log("Jumlah total data dari API:", data.length);
 
       if (filters.start_time && filters.end_time) {
         const startTime = new Date(filters.start_time).getTime();
@@ -154,8 +150,6 @@ export class TaxiService {
           return yearA !== yearB ? yearA - yearB : monthA - monthB;
         })
         .map(key => monthlyCounts[key]);
-
-      console.log("Hasil akhir trip per bulan:", result);
 
       return result;
     } catch (error) {
